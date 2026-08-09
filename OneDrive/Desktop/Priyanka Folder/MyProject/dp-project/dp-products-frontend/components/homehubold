@@ -1,0 +1,243 @@
+import { ArrowLeftRight, HelpCircle, Search, ShoppingCart, User } from 'lucide-react';
+import { useState } from 'react';
+import { ActiveView, ProductItem, UserProfile } from '../types';
+
+// Child Modular Page Imports
+import { CATEGORIES } from '../utils/mockData';
+import CartModal from './CartModal';
+import HelpModal from './HelpModal';
+import OrderSuccessModal from './OrderSuccessModal';
+import PaymentModal from './PaymentModal';
+import ProfileDrawer from './ProfileDrawer';
+import TrackingModal from './TrackingModal';
+
+// // Static Data Infrastructure for Phase Testing
+// const CATEGORIES = [
+//   { id: 1, name: 'For You', icon_name: '✨', current_offer: 'Extra 10% Cash Back at checkout!' },
+//   { id: 2, name: 'Clothing', icon_name: '👕', current_offer: 'Buy 1 Get 1 Free on Select Apparel!' },
+//   { id: 3, name: 'Electronics', icon_name: '⚡', current_offer: 'Flat 15% Instant Off on Cards!' },
+//   { id: 4, name: 'Furniture', icon_name: '🛋️', current_offer: 'No Cost EMI available up to 12 months!' },
+//   { id: 5, name: 'Veggies', icon_name: '🥦', current_offer: 'Fresh morning harvest: 20% bundle discount!' },
+//   { id: 6, name: 'Food', icon_name: '🍔', current_offer: 'Free delivery on meals above ₹399!' },
+//   { id: 7, name: 'Mobiles', icon_name: '📱', current_offer: 'Exchange bonus values bumped by ₹5,000!' },
+//   { id: 8, name: 'Books', icon_name: '📚', current_offer: 'Reader Hub: Buy 2 Get 1 Free on trending paperbacks!' },
+//   { id: 9, name: 'Beauty Products', icon_name: '💄', current_offer: 'Glam Up: Flat 20% Off on top brands!' }
+// ];
+
+// const PRODUCTS: ProductItem[] = [
+//   { id: 1, category_id: 2, name: 'Classic Blue Denim Jacket', description: 'Vintage washed regular fit rugged outerwear', price: 2499.00, image_url: '/img/denim.jpg' },
+//   { id: 2, category_id: 2, name: 'Premium Fleece Hoodie', description: 'Ultra-soft relaxed fit winter casual wear', price: 1899.00, image_url: '/img/hoodie.jpg' },
+//   { id: 3, category_id: 3, name: 'Quantum Wireless Headphones', description: 'Active noise cancelling premium headset', price: 6499.00, image_url: '/img/headphones.jpg' },
+//   { id: 4, category_id: 3, name: 'Mechanical RGB Keyboard', description: 'Tactile clicky switches with backlighting', price: 4200.00, image_url: '/img/keyboard.jpg' },
+//   { id: 5, category_id: 5, name: 'Hydroponic Cherry Tomatoes (500g)', description: 'Sweet farm-fresh vine-ripened tomatoes', price: 140.00, image_url: '/img/tomatoes.jpg' },
+//   { id: 6, category_id: 7, name: 'Flagship X200 Smartphone', description: '128GB storage, Pro-grade camera array, 120Hz display', price: 54999.00, image_url: '/img/mobile1.jpg' }
+// ];
+
+interface HomeHubProps {
+  user: UserProfile | null;
+  onLogout: () => void;
+  onExit: () => void;
+  onUpdateProfile: (updated: UserProfile) => void;
+}
+
+export default function HomeHubView({ user, onLogout, onExit, onUpdateProfile }: HomeHubProps) {
+  const [view, setView] = useState<ActiveView>('BROWSE');
+  const [activeCat, setActiveCat] = useState(CATEGORIES[0]);
+  const [search, setSearch] = useState('');
+  const [cart, setCart] = useState<ProductItem[]>([]);
+  const [isEditProfile, setIsEditProfile] = useState(false);
+  
+  // Profile edit fields state
+//   const [editName, setEditName] = useState(user?.name || '');
+//   const [editPhone, setEditPhone] = useState(user?.phone || '');
+//   const [editAddress, setEditAddress] = useState(user?.address || '');
+
+//   const handleSaveProfile = () => {
+//     onUpdateProfile({
+//       name: editName,
+//       phone: editPhone,
+//       address: editAddress,
+//       email: user?.email || ''
+//     });
+//     setIsEditProfile(false);
+//   };
+
+//   const addToCart = (product: ProductItem) => setCart([...cart, product]);
+//   const removeFromCart = (id: number) => setCart(cart.filter(item => item.id !== id));
+
+//   const filteredProducts = PRODUCTS.filter(p => {
+//     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
+//                           p.description.toLowerCase().includes(search.toLowerCase());
+//     if (search) return matchesSearch;
+//     return p.category_id === activeCat.id;
+//   });
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Dynamic Ribbon Offers */}
+            {/* Top Interactive Promotional Offers Banner */}
+      <div className="bg-amber-400 text-slate-900 text-xs md:text-sm font-bold py-2.5 px-4 text-center flex justify-between items-center overflow-x-auto whitespace-nowrap scrollbar-none gap-8 shadow-sm">
+        <button 
+          onClick={() => setSearch('Jacket')} 
+          className="hover:underline hover:text-indigo-800 transition text-left cursor-pointer active:scale-95"
+        >
+          🎉 Special Store Promotion: Flat 15% OFF Base Catalog Pricing!
+        </button>
+        <button 
+          onClick={() => {
+            // Clears any category filters and searches for any product matching premium quality
+            setSearch('Premium');
+          }} 
+          className="hover:underline hover:text-indigo-800 transition text-left cursor-pointer active:scale-95"
+        >
+          👥 Refer your friends & earn ₹250 instant cashbacks!
+        </button>
+        <button 
+          onClick={() => setSearch('Smartphone')} 
+          className="hover:underline hover:text-indigo-800 transition text-left cursor-pointer active:scale-95"
+        >
+          🚀 Premium express cargo delivery channels active!
+        </button>
+      </div>
+                {/* Touch Scrollable Categories Track Navigation Bar */}
+          {/* <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setSearch(''); // IMPORTANT: Clears the ribbon/text search to display category matches instead
+                  setActiveCat(cat);
+                }}
+                className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs whitespace-nowrap transition snap-center ${
+                  activeCat.id === cat.id && !search
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span>{cat.icon_name}</span>
+                <span>{cat.name}</span>
+              </button>
+            ))}
+          </div> */}
+
+
+
+      {/* Global Navigation Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm max-w-7xl mx-auto rounded-xl mt-2 px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <h2 className="text-xl font-black text-indigo-600 tracking-tight shrink-0">DP PRODUCTS</h2>
+        
+        <div className="relative w-full md:w-1/2">
+          <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+          <input 
+            type="text" 
+            placeholder="Search items, categories or descriptions..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div className="flex items-center space-x-6 text-slate-600 text-xs font-bold shrink-0">
+          <button onClick={() => setIsEditProfile(!isEditProfile)} className="flex items-center gap-1.5 hover:text-indigo-600 transition">
+            <User size={16} /> Profile
+          </button>
+          <button onClick={() => setView('CART')} className="flex items-center gap-1.5 hover:text-indigo-600 transition relative">
+            <ShoppingCart size={16} /> Cart 
+            <span className="bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center absolute -top-2 -right-3 font-black">
+              {cart.length}
+            </span>
+          </button>
+          <button onClick={() => setView('HELP')} className="flex items-center gap-1.5 hover:text-indigo-600 transition">
+            <HelpCircle size={16} /> Help
+          </button>
+        </div>
+      </header>
+
+      {/* Edit Profile Dropdown Widget Drawer */}
+      {isEditProfile && (
+            <ProfileDrawer 
+                user={user}
+                onLogout={onLogout}
+                onUpdateProfile={onUpdateProfile}
+                onClose={() => setIsEditProfile(false)}
+            />
+)}
+
+      {view === 'BROWSE' && (
+        <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+          {/* Scrollable Horizontal Track */}
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setSearch('');
+                  setActiveCat(cat);
+                }}
+                className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs whitespace-nowrap transition snap-center ${
+                  activeCat.id === cat.id && !search
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span>{cat.icon_name}</span>
+                <span>{cat.name}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Active Offer Banner Card */}
+          <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex items-center justify-between text-xs">
+            <div>
+              <p className="text-indigo-400 font-bold uppercase tracking-wide">Category Campaign Discount</p>
+              <h4 className="text-slate-800 font-black text-sm mt-0.5">{search ? 'Dynamic Search Matches' : activeCat.current_offer}</h4>
+            </div>
+            <div className="flex gap-1 bg-white px-2.5 py-1 rounded-lg border text-indigo-600 font-bold border-indigo-100 items-center">
+              <ArrowLeftRight size={12} /> Swipe
+            </div>
+          </div>
+
+          {/* Core Product Grid Display Grid */}
+          <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((prod) => (
+              <div key={prod.id} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition group">
+                <div>
+                  <div className="w-full h-40 bg-gradient-to-tr from-slate-100 to-indigo-50/30 rounded-2xl mb-4 flex items-center justify-center text-slate-300 text-3xl group-hover:scale-[1.01] transition-transform">🛍️</div>
+                                    <h4 className="font-black text-slate-800 text-base">{prod.name}</h4>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 font-medium">{prod.description}</p>
+                </div>
+                <div className="flex items-center justify-between border-t border-slate-100 mt-4 pt-4">
+                  <span className="text-lg font-black text-slate-900">₹{prod.price.toFixed(2)}</span>
+                  <button 
+                    onClick={() => addToCart(prod)}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-indigo-50"
+                  >
+                    + Add To Bag
+                  </button>
+                </div>
+              </div>
+            ))}
+          </main>
+        </div>
+      )}
+
+      {/* RENDER MODAL LAYOUTS BASED ON STATE */}
+      {view === 'CART' && (
+        <CartModal cart={cart} onClose={() => setView('BROWSE')} onRemove={removeFromCart} onProceed={() => setView('PAYMENT')} />
+      )}
+      {view === 'PAYMENT' && (
+        <PaymentModal cart={cart} onClose={() => setView('BROWSE')} onPaymentSuccess={() => setView('SUCCESS')} />
+      )}
+      {view === 'SUCCESS' && (
+        <OrderSuccessModal cart={cart} onClose={() => { setCart([]); setView('BROWSE'); }} onViewTracking={() => setView('TRACKING')} onExit={onExit} />
+      )}
+      {view === 'TRACKING' && (
+        <TrackingModal onClose={() => { setCart([]); setView('BROWSE'); }} />
+      )}
+      {view === 'HELP' && (
+        <HelpModal onClose={() => setView('BROWSE')} />
+      )}
+    </div>
+  );
+}
+
